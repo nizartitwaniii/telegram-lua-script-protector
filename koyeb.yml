@@ -1,0 +1,22 @@
+name: lua-script-protection-bot
+services:
+  - name: web
+    docker:
+      dockerfile: Dockerfile
+    instance:
+      type: micro
+    ports:
+      - port: 3000
+        protocol: http
+    env:
+      - name: PORT
+        value: "3000"
+      - name: NODE_ENV
+        value: "production"
+    health_check:
+      http:
+        path: /
+        port: 3000
+    routes:
+      - path: /
+        port: 3000
