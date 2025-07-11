@@ -1,0 +1,26 @@
+[app]
+name = "telegram-lua-script-protector"
+
+[app.env]
+PORT = "8000"
+NODE_ENV = "production"
+
+[service]
+name = "api"
+type = "web"
+
+[service.git]
+branch = "main"
+build_command = "npm run build"
+run_command = "npm start"
+
+[service.ports]
+port = 8000
+protocol = "http"
+
+[service.health_check]
+path = "/api/health"
+
+[service.env]
+NODE_ENV = "production"
+PORT = "8000"
