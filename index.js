@@ -90,13 +90,31 @@ app.get('/s/:id', (req, res) => {
     return res.status(404).send('السكربت غير موجود');
   }
 
-  // Check User-Agent to allow only Roblox HTTP requests
+  // Check User-Agent to allow Roblox HTTP requests
   const userAgent = req.headers["user-agent"] || "";
-  const isRoblox = userAgent.includes("Roblox") || userAgent.includes("HttpGet");
+  console.log(`طلب سكربت ${id} من User-Agent: ${userAgent}`);
+  
+  // تحديث التحقق من Roblox - السماح بأنواع User-Agent المختلفة
+  const isRoblox = userAgent.includes("Roblox") || 
+                   userAgent.includes("HttpGet") || 
+                   userAgent.includes("RobloxStudio") ||
+                   userAgent.includes("RCC") ||
+                   userAgent === "" || // بعض طلبات Roblox بدون User-Agent
+                   userAgent.toLowerCase().includes("roblox");
+  
   if (!isRoblox) {
+    console.log(`رفض طلب من User-Agent غير مُصرح: ${userAgent}`);
     return res.status(403).send("Access denied: This endpoint is for Roblox execution only.");
   }
 
+  // تسجيل الوصول للسكربت
+  if (scriptDB[id]) {
+    scriptDB[id].accessCount = (scriptDB[id].accessCount || 0) + 1;
+    scriptDB[id].lastAccessed = new Date().toISOString();
+    saveScripts(); // حفظ العدادات
+  }
+
+  console.log(`تم تقديم السكربت ${id} بنجاح`);
   res.type('text/plain').send(scriptDB[id].script);
 });
 
